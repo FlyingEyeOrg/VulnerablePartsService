@@ -3,7 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FlyingEye.VulnerablePartsService", "src\FlyingEye.VulnerablePartsService\FlyingEye.VulnerablePartsService.csproj", "{43247F5C-9D6E-4684-AE08-C33DDE36CC56}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{5B491CC1-0F6D-47DD-AE4C-8F4A55A3AC07}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FlyingEye.VulnerablePartsService", "src\FlyingEye.VulnerablePartsService\FlyingEye.VulnerablePartsService.csproj", "{957BEF58-C66C-4763-A2F5-EEC0BB45A527}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlyingEye.VulnerablePartsService.Domain", "src\FlyingEye.VulnerablePartsService.Domain\FlyingEye.VulnerablePartsService.Domain.csproj", "{94EB6E1D-FD43-4F4D-A9B3-18C6E3275B80}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlyingEye.VulnerablePartsService.EntityFrameworkCore", "src\FlyingEye.VulnerablePartsService.EntityFrameworkCore\FlyingEye.VulnerablePartsService.EntityFrameworkCore.csproj", "{C9C01BBA-776E-459E-9FF6-B4ABF8C52784}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlyingEye.VulnerablePartsService.DbMigrator", "src\FlyingEye.VulnerablePartsService.DbMigrator\FlyingEye.VulnerablePartsService.DbMigrator.csproj", "{0DF39B28-9B98-4781-A7AF-8415C05A1CD4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlyingEye.VulnerablePartsService.Application", "src\FlyingEye.VulnerablePartsService.Application\FlyingEye.VulnerablePartsService.Application.csproj", "{283CAFDF-509C-421B-BDC2-9A88BD8015D5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,12 +21,38 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{43247F5C-9D6E-4684-AE08-C33DDE36CC56}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{43247F5C-9D6E-4684-AE08-C33DDE36CC56}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{43247F5C-9D6E-4684-AE08-C33DDE36CC56}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{43247F5C-9D6E-4684-AE08-C33DDE36CC56}.Release|Any CPU.Build.0 = Release|Any CPU
+		{957BEF58-C66C-4763-A2F5-EEC0BB45A527}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{957BEF58-C66C-4763-A2F5-EEC0BB45A527}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{957BEF58-C66C-4763-A2F5-EEC0BB45A527}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{957BEF58-C66C-4763-A2F5-EEC0BB45A527}.Release|Any CPU.Build.0 = Release|Any CPU
+		{94EB6E1D-FD43-4F4D-A9B3-18C6E3275B80}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{94EB6E1D-FD43-4F4D-A9B3-18C6E3275B80}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{94EB6E1D-FD43-4F4D-A9B3-18C6E3275B80}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{94EB6E1D-FD43-4F4D-A9B3-18C6E3275B80}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C9C01BBA-776E-459E-9FF6-B4ABF8C52784}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C9C01BBA-776E-459E-9FF6-B4ABF8C52784}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C9C01BBA-776E-459E-9FF6-B4ABF8C52784}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C9C01BBA-776E-459E-9FF6-B4ABF8C52784}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0DF39B28-9B98-4781-A7AF-8415C05A1CD4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0DF39B28-9B98-4781-A7AF-8415C05A1CD4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0DF39B28-9B98-4781-A7AF-8415C05A1CD4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0DF39B28-9B98-4781-A7AF-8415C05A1CD4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{283CAFDF-509C-421B-BDC2-9A88BD8015D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{283CAFDF-509C-421B-BDC2-9A88BD8015D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{283CAFDF-509C-421B-BDC2-9A88BD8015D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{283CAFDF-509C-421B-BDC2-9A88BD8015D5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{957BEF58-C66C-4763-A2F5-EEC0BB45A527} = {5B491CC1-0F6D-47DD-AE4C-8F4A55A3AC07}
+		{94EB6E1D-FD43-4F4D-A9B3-18C6E3275B80} = {5B491CC1-0F6D-47DD-AE4C-8F4A55A3AC07}
+		{C9C01BBA-776E-459E-9FF6-B4ABF8C52784} = {5B491CC1-0F6D-47DD-AE4C-8F4A55A3AC07}
+		{0DF39B28-9B98-4781-A7AF-8415C05A1CD4} = {5B491CC1-0F6D-47DD-AE4C-8F4A55A3AC07}
+		{283CAFDF-509C-421B-BDC2-9A88BD8015D5} = {5B491CC1-0F6D-47DD-AE4C-8F4A55A3AC07}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {81D2F112-465D-44E5-AA76-598080DE9F0A}
 	EndGlobalSection
 EndGlobal

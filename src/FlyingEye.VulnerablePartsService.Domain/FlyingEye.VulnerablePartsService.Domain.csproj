@@ -1,0 +1,8 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" Version="8.0.22" />
+		<PackageReference Include="Volo.Abp.Ddd.Domain" Version="8.3.4" />
+	</ItemGroup>
+
+</Project>

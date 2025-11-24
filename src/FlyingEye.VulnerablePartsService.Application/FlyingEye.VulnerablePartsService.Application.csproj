@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<ItemGroup>
+		<PackageReference Include="Volo.Abp.Autofac" Version="8.3.4" />
+		<PackageReference Include="Volo.Abp.AutoMapper" Version="8.3.4" />
+		<PackageReference Include="Volo.Abp.Ddd.Application" Version="8.3.4" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\FlyingEye.VulnerablePartsService.EntityFrameworkCore\FlyingEye.VulnerablePartsService.EntityFrameworkCore.csproj" />
+	</ItemGroup>
+
+</Project>

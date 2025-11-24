@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	
+	<ItemGroup>
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.22">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="8.0.22" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="8.0.22" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.22">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Volo.Abp.EntityFrameworkCore.MySQL" Version="8.3.4" />
+	</ItemGroup>
+	
+	<ItemGroup>
+	  <ProjectReference Include="..\FlyingEye.VulnerablePartsService.Domain\FlyingEye.VulnerablePartsService.Domain.csproj" />
+	</ItemGroup>
+	
+</Project>
