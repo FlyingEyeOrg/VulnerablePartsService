@@ -1,0 +1,29 @@
+<Project>
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<Version>1.0.0</Version>
+		<RootNamespace>FlyingEye</RootNamespace>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+		<Version>1.0.0-RC</Version>
+		<WarningsNotAsErrors>NU1901;NU1902;NU1903;NU1904</WarningsNotAsErrors>
+	</PropertyGroup>
+
+	<!--产品信息-->
+	<PropertyGroup>
+		<Product>FlyingEye</Product>
+		<Authors>lanxiaofang</Authors>
+	</PropertyGroup>
+
+	<PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+		<SatelliteResourceLanguages>zh-CN;en-US</SatelliteResourceLanguages>
+		<DebugType>none</DebugType>
+	</PropertyGroup>
+
+	<!--Common-->
+	<PropertyGroup>
+		<NoWarn>CS1591</NoWarn>
+	</PropertyGroup>
+
+</Project>
