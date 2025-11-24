@@ -1,5 +1,3 @@
-using Asp.Versioning.ApiExplorer;
-
 namespace FlyingEye.Extensions
 {
     public static class WebApplicationConfigExtensions

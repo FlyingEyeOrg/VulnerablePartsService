@@ -1,5 +1,3 @@
-
-
 namespace FlyingEye.Extensions
 {
     public static class ServiceOptionsExetnsions
@@ -9,11 +7,8 @@ namespace FlyingEye.Extensions
             var services = builder.Services;
             var configuration = builder.Configuration;
 
+            // register you options here, such as:
             // services.Configure<DeviceClientServiceOptions>(configuration.GetSection(key: nameof(DeviceClientServiceOptions)));
-            // services.Configure<HttpClientServiceOptions>(configuration.GetSection(key: nameof(HttpClientServiceOptions)));
-            // services.Configure<DeviceClientServiceOptions>(configuration.GetSection(key: nameof(DeviceClientServiceOptions)));
-            // services.Configure<ComeUserNotificationOptions>(configuration.GetSection(key: nameof(ComeUserNotificationOptions)));
-            // services.Configure<ComeGroupNotificationOptions>(configuration.GetSection(key: nameof(ComeGroupNotificationOptions)));
 
             return builder;
         }
