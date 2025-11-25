@@ -62,7 +62,7 @@ namespace FlyingEye.Controllers
 
             return CreatedAtRoute(
             "GetAsync",
-             new { id = result.Id },  
+             new { id = result.Id },
              new
              {
                  id = result.Id,
@@ -94,6 +94,7 @@ namespace FlyingEye.Controllers
         /// <param name="resourceId">设备资源号</param>
         /// <param name="startTime">开始时间</param>
         /// <param name="endTime">结束时间</param>
+        /// <param name="sorting">排序参数</param>
         /// <param name="skipCount">跳过数量</param>
         /// <param name="maxResultCount">每页大小</param>
         /// <returns>分页查询结果</returns>
@@ -106,6 +107,7 @@ namespace FlyingEye.Controllers
             [Required][FromRoute] string resourceId,
             [FromQuery][Required] DateTime startTime,
             [FromQuery][Required] DateTime endTime,
+            [FromQuery] string sorting = "CreationTime DESC",
             [FromQuery] int skipCount = 0,
             [FromQuery] int maxResultCount = 10)
         {
@@ -113,6 +115,7 @@ namespace FlyingEye.Controllers
                 resourceId: resourceId,
                 startTime: startTime,
                 endTime: endTime,
+                sorting: sorting,
                 skipCount: skipCount,
                 maxResultCount: maxResultCount);
 

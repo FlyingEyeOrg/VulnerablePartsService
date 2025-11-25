@@ -346,7 +346,7 @@ namespace FlyingEye.SpacerServices
         }
 
         /// <summary>
-        /// 分页获取指定时间段的记录
+        /// 分页获取指定时间段的记录（支持排序）
         /// </summary>
         public async Task<SpacerRecordsQueryResult> GetPagedRecordsByTimeRangeAsync(SpacerRecordsQueryRequest request)
         {
@@ -371,9 +371,11 @@ namespace FlyingEye.SpacerServices
                 );
             }
 
+            // 应用排序规则
+            var sortedQuery = ApplySorting(baseQuery, request.Sorting);
+
             // 获取分页数据
-            var records = await baseQuery
-                .OrderByDescending(x => x.CreationTime)
+            var records = await sortedQuery
                 .Skip(request.SkipCount)
                 .Take(request.MaxResultCount)
                 .ToListAsync();
@@ -381,6 +383,100 @@ namespace FlyingEye.SpacerServices
             var data = ObjectMapper.Map<List<SpacerValidationDataModel>, List<SpacerValidationDataResult>>(records);
 
             return new SpacerRecordsQueryResult(data, totalCount, request.SkipCount, request.MaxResultCount);
+        }
+
+        /// <summary>
+        /// 应用排序规则
+        /// </summary>
+        private IQueryable<SpacerValidationDataModel> ApplySorting(
+            IQueryable<SpacerValidationDataModel> query, string sorting)
+        {
+            if (string.IsNullOrWhiteSpace(sorting))
+            {
+                // 默认排序：按创建时间降序
+                return query.OrderByDescending(x => x.CreationTime);
+            }
+
+            // 解析排序字符串（支持多字段排序，如 "CreationTime DESC, Date ASC"）
+            var sortFields = sorting.Split(',', StringSplitOptions.RemoveEmptyEntries);
+
+            IOrderedQueryable<SpacerValidationDataModel>? orderedQuery = null;
+
+            foreach (var sortField in sortFields)
+            {
+                var parts = sortField.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                var fieldName = parts[0].Trim();
+                var sortDirection = parts.Length > 1 ? parts[1].Trim().ToUpper() : "ASC";
+
+                orderedQuery = ApplySingleSort(orderedQuery ?? query, fieldName, sortDirection);
+            }
+
+            return orderedQuery ?? query.OrderByDescending(x => x.CreationTime);
+        }
+
+        /// <summary>
+        /// 应用单个字段排序
+        /// </summary>
+        private IOrderedQueryable<SpacerValidationDataModel> ApplySingleSort(
+            IQueryable<SpacerValidationDataModel> query, string fieldName, string sortDirection)
+        {
+            var isAscending = sortDirection == "ASC";
+
+            return fieldName.ToLowerInvariant() switch
+            {
+                "creationtime" => isAscending
+                    ? query.OrderBy(x => x.CreationTime)
+                    : query.OrderByDescending(x => x.CreationTime),
+
+                "date" => isAscending
+                    ? query.OrderBy(x => x.Date)
+                    : query.OrderByDescending(x => x.Date),
+
+                "modelpn" => isAscending
+                    ? query.OrderBy(x => x.ModelPn)
+                    : query.OrderByDescending(x => x.ModelPn),
+
+                "resourceid" => isAscending
+                    ? query.OrderBy(x => x.ResourceId)
+                    : query.OrderByDescending(x => x.ResourceId),
+
+                "site" => isAscending
+                    ? query.OrderBy(x => x.Site)
+                    : query.OrderByDescending(x => x.Site),
+
+                "operator" => isAscending
+                    ? query.OrderBy(x => x.Operator)
+                    : query.OrderByDescending(x => x.Operator),
+
+                "bigcoatingwidth" => isAscending
+                    ? query.OrderBy(x => x.BigCoatingWidth)
+                    : query.OrderByDescending(x => x.BigCoatingWidth),
+
+                "smallcoatingwidth" => isAscending
+                    ? query.OrderBy(x => x.SmallCoatingWidth)
+                    : query.OrderByDescending(x => x.SmallCoatingWidth),
+
+                "whitespacewidth" => isAscending
+                    ? query.OrderBy(x => x.WhiteSpaceWidth)
+                    : query.OrderByDescending(x => x.WhiteSpaceWidth),
+
+                "at11width" => isAscending
+                    ? query.OrderBy(x => x.AT11Width)
+                    : query.OrderByDescending(x => x.AT11Width),
+
+                "thickness" => isAscending
+                    ? query.OrderBy(x => x.Thickness)
+                    : query.OrderByDescending(x => x.Thickness),
+
+                "absite" => isAscending
+                    ? query.OrderBy(x => x.ABSite)
+                    : query.OrderByDescending(x => x.ABSite),
+
+                _ => throw new HttpBadRequestException(
+                    message: $"不支持的排序字段: {fieldName}",
+                    details: $"支持的排序字段: CreationTime, Date, ModelPn, ResourceId, Site, Operator, BigCoatingWidth, SmallCoatingWidth, WhiteSpaceWidth, AT11Width, Thickness, ABSite"
+                )
+            };
         }
     }
 }

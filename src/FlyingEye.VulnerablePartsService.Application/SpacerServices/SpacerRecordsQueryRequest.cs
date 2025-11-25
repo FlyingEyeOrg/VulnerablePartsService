@@ -11,12 +11,14 @@ namespace FlyingEye.SpacerServices
             string resourceId,
             DateTime startTime,
             DateTime endTime,
+            string sorting,
             int skipCount,
             int maxResultCount)
         {
             ResourceId = resourceId;
             StartTime = startTime;
             EndTime = endTime;
+            Sorting = sorting;
             SkipCount = skipCount;
             MaxResultCount = maxResultCount;
         }
@@ -35,6 +37,11 @@ namespace FlyingEye.SpacerServices
         /// 结束时间
         /// </summary>
         public DateTime EndTime { get; set; }
+
+        /// <summary>
+        /// 排序规则
+        /// </summary>
+        public string Sorting { get; set; }
 
         /// <summary>
         /// 跳过数量（用于分页）
