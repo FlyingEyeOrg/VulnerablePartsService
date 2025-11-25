@@ -4,6 +4,7 @@ using FlyingEye.Spacers.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Volo.Abp.Application.Services;
+using Volo.Abp.ObjectMapping;
 
 namespace FlyingEye.SpacerServices
 {
@@ -17,6 +18,35 @@ namespace FlyingEye.SpacerServices
         public SpacerValidationService(ISpacerValidationDataRepository spacerValidationDataRepository)
         {
             _spacerValidationDataRepository = spacerValidationDataRepository;
+        }
+
+        /// <summary>
+        /// 根据ID获取垫片参数信息
+        /// </summary>
+        /// <param name="id">垫片参数记录的唯一标识符</param>
+        /// <returns>垫片参数详细信息</returns>
+        /// <exception cref="HttpNotFoundException">当指定ID的记录不存在时抛出</exception>
+        public async Task<SpacerValidationDataResult> GetAsync(Guid id)
+        {
+            // 验证ID有效性
+            if (id == Guid.Empty)
+            {
+                throw new HttpBadRequestException("ID不能为空", "INVALID_ID");
+            }
+
+            // 查询数据库
+            var model = await _spacerValidationDataRepository.FindAsync(id);
+
+            // 检查记录是否存在
+            if (model == null)
+            {
+                throw new HttpNotFoundException(
+                    message: $"未找到ID为 {id} 的垫片参数记录",
+                    details: $"请检查ID是否正确，或该记录可能已被删除"
+                );
+            }
+
+            return ObjectMapper.Map<SpacerValidationDataModel, SpacerValidationDataResult>(model);
         }
 
         /// <summary>
@@ -48,7 +78,7 @@ namespace FlyingEye.SpacerServices
         /// <summary>
         /// 添加新的垫片参数信息
         /// </summary>
-        public async Task AddAsync(SpacerValidationData data)
+        public async Task<SpacerValidationDataResult> AddAsync(SpacerValidationData data)
         {
             // 1. 校验所有必填字段
             VerifyAllFields(data);
@@ -75,7 +105,9 @@ namespace FlyingEye.SpacerServices
             );
 
             // 5. 保存到数据库
-            await _spacerValidationDataRepository.InsertAsync(entity);
+            var model = await _spacerValidationDataRepository.InsertAsync(entity);
+
+            return this.ObjectMapper.Map<SpacerValidationDataModel, SpacerValidationDataResult>(model);
         }
 
         /// <summary>

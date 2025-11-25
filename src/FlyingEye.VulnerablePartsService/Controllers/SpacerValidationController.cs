@@ -1,7 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Asp.Versioning;
+using FlyingEye.Exceptions;
 using FlyingEye.SpacerServices;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Routing;
+using NUglify;
 using Volo.Abp.AspNetCore.Mvc;
 
 namespace FlyingEye.Controllers
@@ -19,6 +23,14 @@ namespace FlyingEye.Controllers
             _spacerValidationService = spacerValidationService;
         }
 
+        [HttpGet]
+        [Route("", Name = "GetAsync")]
+        public async Task<ActionResult<SpacerValidationDataResult>> GetAsync(Guid id)
+        {
+            var result = await _spacerValidationService.GetAsync(id);
+            return Ok(result);
+        }
+
         /// <summary>
         /// 获取设备最新的垫片参数信息
         /// </summary>
@@ -26,10 +38,10 @@ namespace FlyingEye.Controllers
         /// <returns>垫片验证数据</returns>
         [HttpGet]
         [Route("devices/{resourceId}/latest")]
-        [ProducesResponseType(typeof(SpacerValidationData), 200)]
+        [ProducesResponseType(typeof(SpacerValidationDataResult), 200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
-        public async Task<ActionResult<SpacerValidationData>> GetLatestByResourceIdAsync(
+        public async Task<ActionResult<SpacerValidationDataResult>> GetLatestByResourceIdAsync(
             [Required][FromRoute] string resourceId)
         {
             var result = await _spacerValidationService.GetLatestAsync(resourceId);
@@ -39,20 +51,24 @@ namespace FlyingEye.Controllers
         /// <summary>
         /// 添加新的垫片参数信息
         /// </summary>
-        /// <param name="data">垫片验证数据</param>
         /// <returns>操作结果</returns>
         [HttpPost]
-        [Route("")]
         [ProducesResponseType(201)]
         [ProducesResponseType(400)]
         [ProducesResponseType(422)]
-        public async Task<ActionResult> AddAsync([FromBody] SpacerValidationData data)
+        public async Task<ActionResult> AddAsync(SpacerValidationData data)
         {
-            await _spacerValidationService.AddAsync(data);
-            return CreatedAtAction(
-                nameof(GetLatestByResourceIdAsync),
-                new { resourceId = data.ResourceId },
-                new { message = "垫片参数添加成功" });
+            var result = await _spacerValidationService.AddAsync(data);
+
+            return CreatedAtRoute(
+            "GetAsync",
+             new { id = result.Id },  
+             new
+             {
+                 id = result.Id,
+                 message = "垫片参数添加成功",
+                 resourceId = data.ResourceId
+             });
         }
 
         /// <summary>
