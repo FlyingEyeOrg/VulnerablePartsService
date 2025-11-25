@@ -35,7 +35,7 @@ namespace FlyingEye.VulnerablePartsServices
             {
                 await _spacerValidationDataRepository.InsertAsync(new Spacers.SpacerValidationDataModel(
                     site: "HD",
-                    resourceId: "TestResourceId",
+                    resourceId: "2EFX1024",
                     @operator: "3439351074",
                     modelPn: "117.5AH",
                     date: "251107",
