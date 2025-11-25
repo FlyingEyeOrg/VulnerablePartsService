@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using FlyingEye.Spacers;
+using FlyingEye.SpacerServices;
 
 namespace FlyingEye
 {
@@ -6,7 +8,8 @@ namespace FlyingEye
     {
         public ApplicationProfile()
         {
-
+            CreateMap<SpacerValidationData, SpacerValidationDataModel>()
+                .ReverseMap();
         }
     }
 }
