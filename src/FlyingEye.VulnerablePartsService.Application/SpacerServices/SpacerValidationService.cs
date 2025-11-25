@@ -311,28 +311,28 @@ namespace FlyingEye.SpacerServices
             // 3. 校验参数是否匹配
             var errors = new List<string>();
 
-            if (!string.Equals(data.ModelPn?.Trim(), model.ModelPn?.Trim(), StringComparison.OrdinalIgnoreCase))
+            if (!string.Equals(data.ModelPn?.Trim(), model.ModelPn?.Trim(), StringComparison.Ordinal))
                 errors.Add($"机种: 已维护值 '{model.ModelPn}' ≠ 输入值 '{data.ModelPn}'");
 
-            if (!string.Equals(data.Date?.Trim(), model.Date?.Trim(), StringComparison.OrdinalIgnoreCase))
+            if (!string.Equals(data.Date?.Trim(), model.Date?.Trim(), StringComparison.Ordinal))
                 errors.Add($"时间: 已维护值 '{model.Date}' ≠ 输入值 '{data.Date}'");
 
-            if (!string.Equals(data.BigCoatingWidth?.Trim(), model.BigCoatingWidth?.Trim(), StringComparison.OrdinalIgnoreCase))
+            if (!string.Equals(data.BigCoatingWidth?.Trim(), model.BigCoatingWidth?.Trim(), StringComparison.Ordinal))
                 errors.Add($"大膜宽: 已维护值 '{model.BigCoatingWidth}' ≠ 输入值 '{data.BigCoatingWidth}'");
 
-            if (!string.Equals(data.SmallCoatingWidth?.Trim(), model.SmallCoatingWidth?.Trim(), StringComparison.OrdinalIgnoreCase))
+            if (!string.Equals(data.SmallCoatingWidth?.Trim(), model.SmallCoatingWidth?.Trim(), StringComparison.Ordinal))
                 errors.Add($"小膜宽: 已维护值 '{model.SmallCoatingWidth}' ≠ 输入值 '{data.SmallCoatingWidth}'");
 
-            if (!string.Equals(data.WhiteSpaceWidth?.Trim(), model.WhiteSpaceWidth?.Trim(), StringComparison.OrdinalIgnoreCase))
+            if (!string.Equals(data.WhiteSpaceWidth?.Trim(), model.WhiteSpaceWidth?.Trim(), StringComparison.Ordinal))
                 errors.Add($"极耳宽度: 已维护值 '{model.WhiteSpaceWidth}' ≠ 输入值 '{data.WhiteSpaceWidth}'");
 
-            if (!string.Equals(data.AT11Width?.Trim(), model.AT11Width?.Trim(), StringComparison.OrdinalIgnoreCase))
+            if (!string.Equals(data.AT11Width?.Trim(), model.AT11Width?.Trim(), StringComparison.Ordinal))
                 errors.Add($"AT11宽度: 已维护值 '{model.AT11Width}' ≠ 输入值 '{data.AT11Width}'");
 
-            if (!string.Equals(data.Thickness?.Trim(), model.Thickness?.Trim(), StringComparison.OrdinalIgnoreCase))
+            if (!string.Equals(data.Thickness?.Trim(), model.Thickness?.Trim(), StringComparison.Ordinal))
                 errors.Add($"垫片厚度: 已维护值 '{model.Thickness}' ≠ 输入值 '{data.Thickness}'");
 
-            if (!string.Equals(data.ABSite?.Trim(), model.ABSite?.Trim(), StringComparison.OrdinalIgnoreCase))
+            if (!string.Equals(data.ABSite?.Trim(), model.ABSite?.Trim(), StringComparison.Ordinal))
                 errors.Add($"A/B面: 已维护值 '{model.ABSite}' ≠ 输入值 '{data.ABSite}'");
 
             // 4. 如果有不匹配的字段，抛出异常
