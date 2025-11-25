@@ -21,7 +21,7 @@ namespace FlyingEye.SpacerServices
         /// <summary>
         /// 获取最新的垫片参数信息（优化版）
         /// </summary>
-        public async Task<SpacerValidationData> GetLatestAsync(string resourceId)
+        public async Task<SpacerValidationDataResult> GetLatestAsync(string resourceId)
         {
             if (string.IsNullOrWhiteSpace(resourceId))
             {
@@ -41,7 +41,7 @@ namespace FlyingEye.SpacerServices
                 throw new HttpNotFoundException($"PE 未维护设备 {trimmedResourceId} 的垫片信息");
             }
 
-            return ObjectMapper.Map<SpacerValidationDataModel, SpacerValidationData>(latestEntity);
+            return ObjectMapper.Map<SpacerValidationDataModel, SpacerValidationDataResult>(latestEntity);
         }
 
         /// <summary>
@@ -298,7 +298,7 @@ namespace FlyingEye.SpacerServices
                 .Take(request.MaxResultCount)
                 .ToListAsync();
 
-            var data = ObjectMapper.Map<List<SpacerValidationDataModel>, List<SpacerValidationData>>(records);
+            var data = ObjectMapper.Map<List<SpacerValidationDataModel>, List<SpacerValidationDataResult>>(records);
 
             return new SpacerRecordsQueryResult(data, totalCount, request.SkipCount, request.MaxResultCount);
         }

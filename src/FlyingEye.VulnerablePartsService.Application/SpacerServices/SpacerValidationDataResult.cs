@@ -2,9 +2,9 @@
 
 namespace FlyingEye.SpacerServices
 {
-    public class SpacerValidationData 
+    public class SpacerValidationDataResult : AuditedEntityDto<Guid>
     {
-        public SpacerValidationData(
+        public SpacerValidationDataResult(
             string site,
             string resourceId,
             string @operator,

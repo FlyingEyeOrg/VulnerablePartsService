@@ -8,7 +8,7 @@
         /// <summary>
         /// 数据列表
         /// </summary>
-        public List<SpacerValidationData> Data { get; set; }
+        public List<SpacerValidationDataResult> Data { get; set; }
 
         /// <summary>
         /// 总记录数
@@ -46,7 +46,7 @@
         public bool HasNextPage => CurrentPage < TotalPages;
 
         public SpacerRecordsQueryResult(
-            List<SpacerValidationData> data,
+            List<SpacerValidationDataResult> data,
             int totalCount,
             int skipCount,
             int maxResultCount)
