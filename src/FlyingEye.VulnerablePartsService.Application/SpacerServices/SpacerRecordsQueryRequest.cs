@@ -53,22 +53,22 @@ namespace FlyingEye.SpacerServices
         {
             if (string.IsNullOrWhiteSpace(ResourceId))
             {
-                throw new UserFriendlyException("设备资源号不能为空");
+                throw new HttpBadRequestException("设备资源号不能为空");
             }
 
             if (StartTime > EndTime)
             {
-                throw new UserFriendlyException("开始时间不能大于结束时间");
+                throw new HttpBadRequestException("开始时间不能大于结束时间");
             }
 
             if (SkipCount < 0)
             {
-                throw new UserFriendlyException("跳过数量不能为负数");
+                throw new HttpBadRequestException("跳过数量不能为负数");
             }
 
             if (MaxResultCount <= 0 || MaxResultCount > 1000)
             {
-                throw new UserFriendlyException("每页记录数应在1-1000之间");
+                throw new HttpBadRequestException("每页记录数应在1-1000之间");
             }
         }
     }

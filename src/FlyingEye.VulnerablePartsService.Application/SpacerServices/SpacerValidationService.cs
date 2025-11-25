@@ -6,6 +6,9 @@ using Volo.Abp.Application.Services;
 
 namespace FlyingEye.SpacerServices
 {
+    /// <summary>
+    /// 垫片验证服务
+    /// </summary>
     internal class SpacerValidationService : ApplicationService
     {
         private readonly ISpacerValidationDataRepository _spacerValidationDataRepository;
@@ -22,7 +25,7 @@ namespace FlyingEye.SpacerServices
         {
             if (string.IsNullOrWhiteSpace(resourceId))
             {
-                throw new UserFriendlyException("设备资源号不能为空");
+                throw new HttpBadRequestException("设备资源号不能为空");
             }
 
             var trimmedResourceId = resourceId.Trim(); // 提前Trim
@@ -35,7 +38,7 @@ namespace FlyingEye.SpacerServices
 
             if (latestEntity == null)
             {
-                throw new UserFriendlyException($"PE 未维护设备 {trimmedResourceId} 的垫片信息");
+                throw new HttpNotFoundException($"PE 未维护设备 {trimmedResourceId} 的垫片信息");
             }
 
             return ObjectMapper.Map<SpacerValidationDataModel, SpacerValidationData>(latestEntity);
@@ -157,7 +160,7 @@ namespace FlyingEye.SpacerServices
 
             if (errors.Count > 0)
             {
-                throw new UserFriendlyException($"数据验证失败：\n{string.Join("\n", errors)}");
+                throw new HttpBadRequestException($"数据验证失败：\n{string.Join("\n", errors)}");
             }
         }
 
@@ -175,17 +178,17 @@ namespace FlyingEye.SpacerServices
         private SpacerValidationData TrimAllFields(SpacerValidationData data)
         {
             return new SpacerValidationData(
-                site: data.Site.Trim(),
-                resourceId: data.ResourceId.Trim(),
-                @operator: data.Operator.Trim(),
-                modelPn: data.ModelPn.Trim(),
-                date: data.Date.Trim(),
-                bigCoatingWidth: data.BigCoatingWidth.Trim(),
-                smallCoatingWidth: data.SmallCoatingWidth.Trim(),
-                whiteSpaceWidth: data.WhiteSpaceWidth.Trim(),
-                aT11Width: data.AT11Width.Trim(),
-                thickness: data.Thickness.Trim(),
-                aBSite: data.ABSite.Trim()
+                site: data.Site?.Trim() ?? string.Empty,
+                resourceId: data.ResourceId?.Trim() ?? string.Empty,
+                @operator: data.Operator?.Trim() ?? string.Empty,
+                modelPn: data.ModelPn?.Trim() ?? string.Empty,
+                date: data.Date?.Trim() ?? string.Empty,
+                bigCoatingWidth: data.BigCoatingWidth?.Trim() ?? string.Empty,
+                smallCoatingWidth: data.SmallCoatingWidth?.Trim() ?? string.Empty,
+                whiteSpaceWidth: data.WhiteSpaceWidth?.Trim() ?? string.Empty,
+                aT11Width: data.AT11Width?.Trim() ?? string.Empty,
+                thickness: data.Thickness?.Trim() ?? string.Empty,
+                aBSite: data.ABSite?.Trim() ?? string.Empty
             );
         }
 
@@ -194,13 +197,13 @@ namespace FlyingEye.SpacerServices
         /// </summary>
         /// <param name="data">垫片参数信息</param>
         /// <returns>void</returns>
-        /// <exception cref="UserFriendlyException">验证失败抛出异常</exception>
+        /// <exception cref="HttpBadRequestException">验证失败抛出异常</exception>
         public async Task VerifyAsync(SpacerValidationData data)
         {
             // 1. 参数空值检查
             if (string.IsNullOrWhiteSpace(data.ResourceId))
             {
-                throw new UserFriendlyException("设备资源号不能为空");
+                throw new HttpBadRequestException("设备资源号不能为空");
             }
 
             // 2. 查询数据库记录
@@ -210,49 +213,49 @@ namespace FlyingEye.SpacerServices
 
             if (model == null)
             {
-                throw new UserFriendlyException($"PE 未维护设备 {trimmedResourceId} 的垫片信息");
+                throw new HttpNotFoundException($"PE 未维护设备 {trimmedResourceId} 的垫片信息");
             }
 
             // 3. 校验8个参数是否相等
             var errors = new List<string>();
 
             // 使用忽略大小写和空格的比较方式
-            if (!string.Equals(data.ModelPn?.Trim(), model.ModelPn?.Trim()))
+            if (!string.Equals(data.ModelPn?.Trim(), model.ModelPn?.Trim(), StringComparison.OrdinalIgnoreCase))
             {
                 errors.Add($"机种: 已维护值 '{model.ModelPn}' ≠ 输入值 '{data.ModelPn}'");
             }
 
-            if (!string.Equals(data.Date?.Trim(), model.Date?.Trim()))
+            if (!string.Equals(data.Date?.Trim(), model.Date?.Trim(), StringComparison.OrdinalIgnoreCase))
             {
                 errors.Add($"时间: 已维护值 '{model.Date}' ≠ 输入值 '{data.Date}'");
             }
 
-            if (!string.Equals(data.BigCoatingWidth?.Trim(), model.BigCoatingWidth?.Trim()))
+            if (!string.Equals(data.BigCoatingWidth?.Trim(), model.BigCoatingWidth?.Trim(), StringComparison.OrdinalIgnoreCase))
             {
                 errors.Add($"大膜宽: 已维护值 '{model.BigCoatingWidth}' ≠ 输入值 '{data.BigCoatingWidth}'");
             }
 
-            if (!string.Equals(data.SmallCoatingWidth?.Trim(), model.SmallCoatingWidth?.Trim()))
+            if (!string.Equals(data.SmallCoatingWidth?.Trim(), model.SmallCoatingWidth?.Trim(), StringComparison.OrdinalIgnoreCase))
             {
                 errors.Add($"小膜宽: 已维护值 '{model.SmallCoatingWidth}' ≠ 输入值 '{data.SmallCoatingWidth}'");
             }
 
-            if (!string.Equals(data.WhiteSpaceWidth?.Trim(), model.WhiteSpaceWidth?.Trim()))
+            if (!string.Equals(data.WhiteSpaceWidth?.Trim(), model.WhiteSpaceWidth?.Trim(), StringComparison.OrdinalIgnoreCase))
             {
                 errors.Add($"极耳宽度: 已维护值 '{model.WhiteSpaceWidth}' ≠ 输入值 '{data.WhiteSpaceWidth}'");
             }
 
-            if (!string.Equals(data.AT11Width?.Trim(), model.AT11Width?.Trim()))
+            if (!string.Equals(data.AT11Width?.Trim(), model.AT11Width?.Trim(), StringComparison.OrdinalIgnoreCase))
             {
                 errors.Add($"AT11宽度: 已维护值 '{model.AT11Width}' ≠ 输入值 '{data.AT11Width}'");
             }
 
-            if (!string.Equals(data.Thickness?.Trim(), model.Thickness?.Trim()))
+            if (!string.Equals(data.Thickness?.Trim(), model.Thickness?.Trim(), StringComparison.OrdinalIgnoreCase))
             {
                 errors.Add($"垫片厚度: 已维护值 '{model.Thickness}' ≠ 输入值 '{data.Thickness}'");
             }
 
-            if (!string.Equals(data.ABSite?.Trim(), model.ABSite?.Trim()))
+            if (!string.Equals(data.ABSite?.Trim(), model.ABSite?.Trim(), StringComparison.OrdinalIgnoreCase))
             {
                 errors.Add($"A/B面: 已维护值 '{model.ABSite}' ≠ 输入值 '{data.ABSite}'");
             }
@@ -261,7 +264,7 @@ namespace FlyingEye.SpacerServices
             if (errors.Count > 0)
             {
                 var errorMessage = $"设备 {trimmedResourceId} 的垫片信息校验失败：\n" + string.Join("\n", errors);
-                throw new UserFriendlyException(errorMessage);
+                throw new HttpUnprocessableEntityException(errorMessage);
             }
         }
 
@@ -270,7 +273,6 @@ namespace FlyingEye.SpacerServices
         /// </summary>
         public async Task<SpacerRecordsQueryResult> GetPagedRecordsByTimeRangeAsync(SpacerRecordsQueryRequest request)
         {
-            // 参数验证
             request.Validate();
 
             var trimmedResourceId = request.ResourceId.Trim();
@@ -283,6 +285,11 @@ namespace FlyingEye.SpacerServices
 
             // 获取总数
             var totalCount = await baseQuery.CountAsync();
+
+            if (totalCount == 0)
+            {
+                throw new HttpNotFoundException($"在指定时间段内未找到设备 {trimmedResourceId} 的垫片记录");
+            }
 
             // 获取分页数据
             var records = await baseQuery
