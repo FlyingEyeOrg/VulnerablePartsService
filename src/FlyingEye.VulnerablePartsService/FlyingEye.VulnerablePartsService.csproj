@@ -1,25 +1,38 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
-  <PropertyGroup>
-    <AssemblyName>VulnerablePartsService</AssemblyName>
-    <Version>1.0.0</Version>
-  </PropertyGroup>
+	<PropertyGroup>
+		<AssemblyName>VulnerablePartsService</AssemblyName>
+		<Version>1.0.0</Version>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Asp.Versioning.Mvc" Version="8.1.0" />
-    <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.1.0" />
-    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="10.0.0" />
-    <PackageReference Include="AutoMapper" Version="14.0.0" />
-    <PackageReference Include="LiteDB" Version="5.0.21" />
-    <PackageReference Include="Serilog.Extensions.Hosting" Version="9.0.0" />
-    <PackageReference Include="Serilog.Sinks.Async" Version="2.1.0" />
-    <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
-    <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.4" />
-    <PackageReference Include="System.IO.Hashing" Version="8.0.0" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Volo.Abp.AspNetCore.Authentication.JwtBearer" Version="8.3.4" />
+		<PackageReference Include="Volo.Abp.AspNetCore.Mvc" Version="8.3.4" />
+		<PackageReference Include="Volo.Abp.AspNetCore.Serilog" Version="8.3.4" />
+		<PackageReference Include="Volo.Abp.Autofac" Version="8.3.4" />
+		<PackageReference Include="Asp.Versioning.Mvc" Version="8.1.0" />
+		<PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.1.0" />
+		<PackageReference Include="AutoMapper" Version="14.0.0" />
+		<PackageReference Include="LiteDB" Version="5.0.21" />
+		<PackageReference Include="Serilog.Extensions.Hosting" Version="9.0.0" />
+		<PackageReference Include="Serilog.Sinks.Async" Version="2.1.0" />
+		<PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
+		<PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
+		<PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.4" />
+		<PackageReference Include="System.IO.Hashing" Version="8.0.0" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\FlyingEye.VulnerablePartsService.Application\FlyingEye.VulnerablePartsService.Application.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\FlyingEye.VulnerablePartsService.Application\FlyingEye.VulnerablePartsService.Application.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="Assets\certificate.pfx">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Assets\ids.jwk">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
 </Project>

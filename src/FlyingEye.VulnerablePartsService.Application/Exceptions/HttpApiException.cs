@@ -21,10 +21,10 @@ namespace FlyingEye.Exceptions
         /// </summary>
         /// <param name="message">面向用户的错误消息</param>
         /// <param name="httpStatusCode">HTTP 状态码</param>
-        /// <param name="errorCode">错误代码，用于前端错误处理</param>
         /// <param name="details">详细的错误信息</param>
-        public HttpApiException(string message, HttpStatusCode httpStatusCode, string? errorCode = null, string? details = null)
-            : base(message, errorCode, details) => HttpStatusCode = httpStatusCode;
+        public HttpApiException(string message, HttpStatusCode httpStatusCode, string? details = null)
+            : base(message, HttpErrorCodes.GetDefaultErrorCode(httpStatusCode), details)
+            => HttpStatusCode = httpStatusCode;
 
         /// <summary>
         /// 初始化 HttpApiException 类的新实例（包含内部异常）
@@ -32,10 +32,10 @@ namespace FlyingEye.Exceptions
         /// <param name="message">面向用户的错误消息</param>
         /// <param name="innerException">导致当前异常的异常</param>
         /// <param name="httpStatusCode">HTTP 状态码</param>
-        /// <param name="errorCode">错误代码，用于前端错误处理</param>
         /// <param name="details">详细的错误信息</param>
-        public HttpApiException(string message, Exception innerException, HttpStatusCode httpStatusCode, string? errorCode = null, string? details = null)
-            : base(message: message, code: errorCode, details: details, innerException: innerException) => HttpStatusCode = httpStatusCode;
+        public HttpApiException(string message, Exception innerException, HttpStatusCode httpStatusCode, string? details = null)
+            : base(message: message, code: HttpErrorCodes.GetDefaultErrorCode(httpStatusCode), details: details, innerException: innerException)
+            => HttpStatusCode = httpStatusCode;
     }
 
     /// <summary>
@@ -49,17 +49,17 @@ namespace FlyingEye.Exceptions
     /// 4. 参数类型不匹配
     /// 示例：
     /// <code>
-    /// throw new HttpBadRequestException("邮箱地址不能为空", "EMAIL_REQUIRED");
-    /// throw new HttpBadRequestException("年龄必须是正整数", "INVALID_AGE_FORMAT");
+    /// throw new HttpBadRequestException("邮箱地址不能为空");
+    /// throw new HttpBadRequestException("年龄必须是正整数");
     /// </code>
     /// </remarks>
     public class HttpBadRequestException : HttpApiException
     {
-        public HttpBadRequestException(string message, string? errorCode = null, string? details = null)
-            : base(message, HttpStatusCode.BadRequest, errorCode, details) { }
+        public HttpBadRequestException(string message, string? details = null)
+            : base(message, HttpStatusCode.BadRequest, details) { }
 
-        public HttpBadRequestException(string message, Exception innerException, string? errorCode = null, string? details = null)
-            : base(message, innerException, HttpStatusCode.BadRequest, errorCode, details) { }
+        public HttpBadRequestException(string message, Exception innerException, string? details = null)
+            : base(message, innerException, HttpStatusCode.BadRequest, details) { }
     }
 
     /// <summary>
@@ -72,17 +72,17 @@ namespace FlyingEye.Exceptions
     /// 3. 需要登录才能访问的资源
     /// 示例：
     /// <code>
-    /// throw new HttpUnauthorizedException("请先登录", "UNAUTHORIZED");
-    /// throw new HttpUnauthorizedException("登录已过期，请重新登录", "TOKEN_EXPIRED");
+    /// throw new HttpUnauthorizedException("请先登录");
+    /// throw new HttpUnauthorizedException("登录已过期");
     /// </code>
     /// </remarks>
     public class HttpUnauthorizedException : HttpApiException
     {
-        public HttpUnauthorizedException(string message, string? errorCode = null, string? details = null)
-            : base(message, HttpStatusCode.Unauthorized, errorCode, details) { }
+        public HttpUnauthorizedException(string message, string? details = null)
+            : base(message, HttpStatusCode.Unauthorized, details) { }
 
-        public HttpUnauthorizedException(string message, Exception innerException, string? errorCode = null, string? details = null)
-            : base(message, innerException, HttpStatusCode.Unauthorized, errorCode, details) { }
+        public HttpUnauthorizedException(string message, Exception innerException, string? details = null)
+            : base(message, innerException, HttpStatusCode.Unauthorized, details) { }
     }
 
     /// <summary>
@@ -97,17 +97,17 @@ namespace FlyingEye.Exceptions
     /// 注意：与 401 的区别是用户身份已验证但权限不足
     /// 示例：
     /// <code>
-    /// throw new HttpForbiddenException("您没有权限执行此操作", "INSUFFICIENT_PERMISSIONS");
-    /// throw new HttpForbiddenException("您的账户已被禁用", "ACCOUNT_DISABLED");
+    /// throw new HttpForbiddenException("您没有权限执行此操作");
+    /// throw new HttpForbiddenException("您的账户已被禁用");
     /// </code>
     /// </remarks>
     public class HttpForbiddenException : HttpApiException
     {
-        public HttpForbiddenException(string message, string? errorCode = null, string? details = null)
-            : base(message, HttpStatusCode.Forbidden, errorCode, details) { }
+        public HttpForbiddenException(string message, string? details = null)
+            : base(message, HttpStatusCode.Forbidden, details) { }
 
-        public HttpForbiddenException(string message, Exception innerException, string? errorCode = null, string? details = null)
-            : base(message, innerException, HttpStatusCode.Forbidden, errorCode, details) { }
+        public HttpForbiddenException(string message, Exception innerException, string? details = null)
+            : base(message, innerException, HttpStatusCode.Forbidden, details) { }
     }
 
     /// <summary>
@@ -120,17 +120,17 @@ namespace FlyingEye.Exceptions
     /// 3. 文件或资源已被删除
     /// 示例：
     /// <code>
-    /// throw new HttpNotFoundException($"用户 {userId} 不存在", "USER_NOT_FOUND");
-    /// throw new HttpNotFoundException("请求的订单不存在", "ORDER_NOT_FOUND");
+    /// throw new HttpNotFoundException($"用户 {userId} 不存在");
+    /// throw new HttpNotFoundException("请求的订单不存在");
     /// </code>
     /// </remarks>
     public class HttpNotFoundException : HttpApiException
     {
-        public HttpNotFoundException(string message, string? errorCode = null, string? details = null)
-            : base(message, HttpStatusCode.NotFound, errorCode, details) { }
+        public HttpNotFoundException(string message, string? details = null)
+            : base(message, HttpStatusCode.NotFound, details) { }
 
-        public HttpNotFoundException(string message, Exception innerException, string? errorCode = null, string? details = null)
-            : base(message, innerException, HttpStatusCode.NotFound, errorCode, details) { }
+        public HttpNotFoundException(string message, Exception innerException, string? details = null)
+            : base(message, innerException, HttpStatusCode.NotFound, details) { }
     }
 
     /// <summary>
@@ -143,17 +143,17 @@ namespace FlyingEye.Exceptions
     /// 3. 操作与当前资源状态冲突
     /// 示例：
     /// <code>
-    /// throw new HttpConflictException("邮箱已被注册", "EMAIL_ALREADY_EXISTS");
-    /// throw new HttpConflictException("订单状态已更新，请刷新后重试", "RESOURCE_CONFLICT");
+    /// throw new HttpConflictException("邮箱已被注册");
+    /// throw new HttpConflictException("订单状态已更新，请刷新后重试");
     /// </code>
     /// </remarks>
     public class HttpConflictException : HttpApiException
     {
-        public HttpConflictException(string message, string? errorCode = null, string? details = null)
-            : base(message, HttpStatusCode.Conflict, errorCode, details) { }
+        public HttpConflictException(string message, string? details = null)
+            : base(message, HttpStatusCode.Conflict, details) { }
 
-        public HttpConflictException(string message, Exception innerException, string? errorCode = null, string? details = null)
-            : base(message, innerException, HttpStatusCode.Conflict, errorCode, details) { }
+        public HttpConflictException(string message, Exception innerException, string? details = null)
+            : base(message, innerException, HttpStatusCode.Conflict, details) { }
     }
 
     /// <summary>
@@ -167,17 +167,17 @@ namespace FlyingEye.Exceptions
     /// 注意：与 400 的区别是参数语法正确但业务逻辑不正确
     /// 示例：
     /// <code>
-    /// throw new HttpUnprocessableEntityException("结束时间不能早于开始时间", "INVALID_TIME_RANGE");
-    /// throw new HttpUnprocessableEntityException("库存不足，无法完成订单", "INSUFFICIENT_STOCK");
+    /// throw new HttpUnprocessableEntityException("结束时间不能早于开始时间");
+    /// throw new HttpUnprocessableEntityException("库存不足，无法完成订单");
     /// </code>
     /// </remarks>
     public class HttpUnprocessableEntityException : HttpApiException
     {
-        public HttpUnprocessableEntityException(string message, string? errorCode = null, string? details = null)
-            : base(message, HttpStatusCode.UnprocessableEntity, errorCode, details) { }
+        public HttpUnprocessableEntityException(string message, string? details = null)
+            : base(message, HttpStatusCode.UnprocessableEntity, details) { }
 
-        public HttpUnprocessableEntityException(string message, Exception innerException, string? errorCode = null, string? details = null)
-            : base(message, innerException, HttpStatusCode.UnprocessableEntity, errorCode, details) { }
+        public HttpUnprocessableEntityException(string message, Exception innerException, string? details = null)
+            : base(message, innerException, HttpStatusCode.UnprocessableEntity, details) { }
     }
 
     /// <summary>
@@ -190,17 +190,17 @@ namespace FlyingEye.Exceptions
     /// 3. 资源访问限流
     /// 示例：
     /// <code>
-    /// throw new HttpTooManyRequestsException("请求过于频繁，请稍后重试", "RATE_LIMIT_EXCEEDED");
-    /// throw new HttpTooManyRequestsException("验证码发送次数超限，请1小时后再试", "SMS_LIMIT_EXCEEDED");
+    /// throw new HttpTooManyRequestsException("请求过于频繁，请稍后重试");
+    /// throw new HttpTooManyRequestsException("验证码发送次数超限，请1小时后再试");
     /// </code>
     /// </remarks>
     public class HttpTooManyRequestsException : HttpApiException
     {
-        public HttpTooManyRequestsException(string message, string? errorCode = null, string? details = null)
-            : base(message, HttpStatusCode.TooManyRequests, errorCode, details) { }
+        public HttpTooManyRequestsException(string message, string? details = null)
+            : base(message, HttpStatusCode.TooManyRequests, details) { }
 
-        public HttpTooManyRequestsException(string message, Exception innerException, string? errorCode = null, string? details = null)
-            : base(message, innerException, HttpStatusCode.TooManyRequests, errorCode, details) { }
+        public HttpTooManyRequestsException(string message, Exception innerException, string? details = null)
+            : base(message, innerException, HttpStatusCode.TooManyRequests, details) { }
     }
 
     /// <summary>
@@ -216,7 +216,7 @@ namespace FlyingEye.Exceptions
     /// 示例：
     /// <code>
     /// throw new HttpInternalServerErrorException("系统繁忙，请稍后重试");
-    /// throw new HttpInternalServerErrorException("数据处理失败，请联系管理员", "DATA_PROCESSING_ERROR");
+    /// throw new HttpInternalServerErrorException("数据处理失败，请联系管理员");
     /// </code>
     /// </remarks>
     public class HttpInternalServerErrorException : HttpApiException
@@ -225,19 +225,17 @@ namespace FlyingEye.Exceptions
         /// 初始化 HttpInternalServerErrorException 类的新实例
         /// </summary>
         /// <param name="message">面向用户的错误消息</param>
-        /// <param name="errorCode">错误代码</param>
         /// <param name="details">详细的错误信息</param>
-        public HttpInternalServerErrorException(string message, string? errorCode = null, string? details = null)
-            : base(message, HttpStatusCode.InternalServerError, errorCode, details) { }
+        public HttpInternalServerErrorException(string message, string? details = null)
+            : base(message, HttpStatusCode.InternalServerError, details) { }
 
         /// <summary>
         /// 初始化 HttpInternalServerErrorException 类的新实例（包含内部异常）
         /// </summary>
         /// <param name="message">面向用户的错误消息</param>
         /// <param name="innerException">导致当前异常的内部异常</param>
-        /// <param name="errorCode">错误代码</param>
         /// <param name="details">详细的错误信息</param>
-        public HttpInternalServerErrorException(string message, Exception innerException, string? errorCode = null, string? details = null)
-            : base(message, innerException, HttpStatusCode.InternalServerError, errorCode, details) { }
+        public HttpInternalServerErrorException(string message, Exception innerException, string? details = null)
+            : base(message, innerException, HttpStatusCode.InternalServerError, details) { }
     }
 }

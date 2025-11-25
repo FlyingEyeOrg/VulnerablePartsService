@@ -2,6 +2,8 @@ namespace FlyingEye.Exceptions
 {
     public static class ErrorCodes
     {
-        public const string SystemError = "SYSTEM_ERROR";
+        private const string Prefix = "App:";
+
+        public const string SystemError = Prefix + "SYSTEM_ERROR";
     }
 }

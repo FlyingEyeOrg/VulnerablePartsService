@@ -1,6 +1,3 @@
-using Autofac;
-using Autofac.Extensions.DependencyInjection;
-using FlyingEye.Extensions;
 using Serilog;
 using Serilog.Events;
 
@@ -8,34 +5,27 @@ namespace FlyingEye
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public async static Task<int> Main(string[] args)
         {
             InitSerilog();
 
-            var builder = WebApplication.CreateBuilder(new WebApplicationOptions()
+            Log.Information("Starting web host.");
+
+            try
             {
-                Args = args,
-#if RELEASE
-                EnvironmentName = Environments.Production
-#else
-                EnvironmentName = Environments.Development
-#endif
-            });
-
-            // Use Autofac as the DI container
-            builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory(builder =>
+                await RunAsync(args);
+            }
+            catch (Exception ex)
             {
-                builder.RegisterModule<AutofacModule>();
-            }));
+                Log.Fatal(ex, "Host terminated unexpectedly!");
+                return 1;
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
 
-            // Add services to the container.
-            builder.ConfigService();
-
-            WebApplication app = builder.Build();
-
-            // Configure the HTTP request pipeline.
-            app.ConfigWebApplication();
-            app.Run();
+            return 0;
         }
 
         private static void InitSerilog()
@@ -64,6 +54,34 @@ namespace FlyingEye
             // 将日志输出到控制台。
             .WriteTo.Async(c => c.Console())
             .CreateLogger();
+        }
+
+        private async static Task<int> RunAsync(string[] args)
+        {
+            var builder = WebApplication.CreateBuilder(new WebApplicationOptions()
+            {
+                Args = args,
+
+#if RELEASE
+                EnvironmentName = Environments.Production
+#else
+                EnvironmentName = Environments.Development
+#endif
+
+            });
+
+            // 配置 autofac 和 日志，添加 autofac 一定要在 AddApplicationAsync 之前。
+            builder.Host.UseAutofac()
+                        .UseSerilog();
+            await builder.AddApplicationAsync<VulnerablePartsServiceModule>();
+
+            var app = builder.Build();
+
+            app.InitializeApplication();
+
+            await app.RunAsync();
+
+            return 0;
         }
     }
 }

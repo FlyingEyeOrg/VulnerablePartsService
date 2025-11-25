@@ -9,7 +9,7 @@ namespace FlyingEye.SpacerServices
     /// <summary>
     /// 垫片验证服务
     /// </summary>
-    internal class SpacerValidationService : ApplicationService
+    public class SpacerValidationService : ApplicationService
     {
         private readonly ISpacerValidationDataRepository _spacerValidationDataRepository;
 

@@ -1,4 +1,5 @@
 using Asp.Versioning;
+using FlyingEye.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 
 #if DEBUG
