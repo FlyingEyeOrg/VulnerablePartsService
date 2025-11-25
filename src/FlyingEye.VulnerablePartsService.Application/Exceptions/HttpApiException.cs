@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using Volo.Abp;
 
 namespace FlyingEye.Exceptions
 {
@@ -21,8 +22,9 @@ namespace FlyingEye.Exceptions
         /// <param name="message">面向用户的错误消息</param>
         /// <param name="httpStatusCode">HTTP 状态码</param>
         /// <param name="errorCode">错误代码，用于前端错误处理</param>
-        public HttpApiException(string message, HttpStatusCode httpStatusCode, string? errorCode = null)
-            : base(message, errorCode) => HttpStatusCode = httpStatusCode;
+        /// <param name="details">详细的错误信息</param>
+        public HttpApiException(string message, HttpStatusCode httpStatusCode, string? errorCode = null, string? details = null)
+            : base(message, errorCode, details) => HttpStatusCode = httpStatusCode;
 
         /// <summary>
         /// 初始化 HttpApiException 类的新实例（包含内部异常）
@@ -31,8 +33,9 @@ namespace FlyingEye.Exceptions
         /// <param name="innerException">导致当前异常的异常</param>
         /// <param name="httpStatusCode">HTTP 状态码</param>
         /// <param name="errorCode">错误代码，用于前端错误处理</param>
-        public HttpApiException(string message, Exception innerException, HttpStatusCode httpStatusCode, string? errorCode = null)
-            : base(message, innerException, errorCode) => HttpStatusCode = httpStatusCode;
+        /// <param name="details">详细的错误信息</param>
+        public HttpApiException(string message, Exception innerException, HttpStatusCode httpStatusCode, string? errorCode = null, string? details = null)
+            : base(message: message, code: errorCode, details: details, innerException: innerException) => HttpStatusCode = httpStatusCode;
     }
 
     /// <summary>
@@ -52,8 +55,11 @@ namespace FlyingEye.Exceptions
     /// </remarks>
     public class HttpBadRequestException : HttpApiException
     {
-        public HttpBadRequestException(string message, string? errorCode = null)
-            : base(message, HttpStatusCode.BadRequest, errorCode) { }
+        public HttpBadRequestException(string message, string? errorCode = null, string? details = null)
+            : base(message, HttpStatusCode.BadRequest, errorCode, details) { }
+
+        public HttpBadRequestException(string message, Exception innerException, string? errorCode = null, string? details = null)
+            : base(message, innerException, HttpStatusCode.BadRequest, errorCode, details) { }
     }
 
     /// <summary>
@@ -72,8 +78,11 @@ namespace FlyingEye.Exceptions
     /// </remarks>
     public class HttpUnauthorizedException : HttpApiException
     {
-        public HttpUnauthorizedException(string message, string? errorCode = null)
-            : base(message, HttpStatusCode.Unauthorized, errorCode) { }
+        public HttpUnauthorizedException(string message, string? errorCode = null, string? details = null)
+            : base(message, HttpStatusCode.Unauthorized, errorCode, details) { }
+
+        public HttpUnauthorizedException(string message, Exception innerException, string? errorCode = null, string? details = null)
+            : base(message, innerException, HttpStatusCode.Unauthorized, errorCode, details) { }
     }
 
     /// <summary>
@@ -94,8 +103,11 @@ namespace FlyingEye.Exceptions
     /// </remarks>
     public class HttpForbiddenException : HttpApiException
     {
-        public HttpForbiddenException(string message, string? errorCode = null)
-            : base(message, HttpStatusCode.Forbidden, errorCode) { }
+        public HttpForbiddenException(string message, string? errorCode = null, string? details = null)
+            : base(message, HttpStatusCode.Forbidden, errorCode, details) { }
+
+        public HttpForbiddenException(string message, Exception innerException, string? errorCode = null, string? details = null)
+            : base(message, innerException, HttpStatusCode.Forbidden, errorCode, details) { }
     }
 
     /// <summary>
@@ -114,8 +126,11 @@ namespace FlyingEye.Exceptions
     /// </remarks>
     public class HttpNotFoundException : HttpApiException
     {
-        public HttpNotFoundException(string message, string? errorCode = null)
-            : base(message, HttpStatusCode.NotFound, errorCode) { }
+        public HttpNotFoundException(string message, string? errorCode = null, string? details = null)
+            : base(message, HttpStatusCode.NotFound, errorCode, details) { }
+
+        public HttpNotFoundException(string message, Exception innerException, string? errorCode = null, string? details = null)
+            : base(message, innerException, HttpStatusCode.NotFound, errorCode, details) { }
     }
 
     /// <summary>
@@ -134,8 +149,11 @@ namespace FlyingEye.Exceptions
     /// </remarks>
     public class HttpConflictException : HttpApiException
     {
-        public HttpConflictException(string message, string? errorCode = null)
-            : base(message, HttpStatusCode.Conflict, errorCode) { }
+        public HttpConflictException(string message, string? errorCode = null, string? details = null)
+            : base(message, HttpStatusCode.Conflict, errorCode, details) { }
+
+        public HttpConflictException(string message, Exception innerException, string? errorCode = null, string? details = null)
+            : base(message, innerException, HttpStatusCode.Conflict, errorCode, details) { }
     }
 
     /// <summary>
@@ -155,8 +173,11 @@ namespace FlyingEye.Exceptions
     /// </remarks>
     public class HttpUnprocessableEntityException : HttpApiException
     {
-        public HttpUnprocessableEntityException(string message, string? errorCode = null)
-            : base(message, HttpStatusCode.UnprocessableEntity, errorCode) { }
+        public HttpUnprocessableEntityException(string message, string? errorCode = null, string? details = null)
+            : base(message, HttpStatusCode.UnprocessableEntity, errorCode, details) { }
+
+        public HttpUnprocessableEntityException(string message, Exception innerException, string? errorCode = null, string? details = null)
+            : base(message, innerException, HttpStatusCode.UnprocessableEntity, errorCode, details) { }
     }
 
     /// <summary>
@@ -175,8 +196,11 @@ namespace FlyingEye.Exceptions
     /// </remarks>
     public class HttpTooManyRequestsException : HttpApiException
     {
-        public HttpTooManyRequestsException(string message, string? errorCode = null)
-            : base(message, HttpStatusCode.TooManyRequests, errorCode) { }
+        public HttpTooManyRequestsException(string message, string? errorCode = null, string? details = null)
+            : base(message, HttpStatusCode.TooManyRequests, errorCode, details) { }
+
+        public HttpTooManyRequestsException(string message, Exception innerException, string? errorCode = null, string? details = null)
+            : base(message, innerException, HttpStatusCode.TooManyRequests, errorCode, details) { }
     }
 
     /// <summary>
@@ -202,8 +226,9 @@ namespace FlyingEye.Exceptions
         /// </summary>
         /// <param name="message">面向用户的错误消息</param>
         /// <param name="errorCode">错误代码</param>
-        public HttpInternalServerErrorException(string message, string? errorCode = null)
-            : base(message, HttpStatusCode.InternalServerError, errorCode) { }
+        /// <param name="details">详细的错误信息</param>
+        public HttpInternalServerErrorException(string message, string? errorCode = null, string? details = null)
+            : base(message, HttpStatusCode.InternalServerError, errorCode, details) { }
 
         /// <summary>
         /// 初始化 HttpInternalServerErrorException 类的新实例（包含内部异常）
@@ -211,7 +236,8 @@ namespace FlyingEye.Exceptions
         /// <param name="message">面向用户的错误消息</param>
         /// <param name="innerException">导致当前异常的内部异常</param>
         /// <param name="errorCode">错误代码</param>
-        public HttpInternalServerErrorException(string message, Exception innerException, string? errorCode = null)
-            : base(message, innerException, HttpStatusCode.InternalServerError, errorCode) { }
+        /// <param name="details">详细的错误信息</param>
+        public HttpInternalServerErrorException(string message, Exception innerException, string? errorCode = null, string? details = null)
+            : base(message, innerException, HttpStatusCode.InternalServerError, errorCode, details) { }
     }
 }
