@@ -206,10 +206,10 @@ namespace FlyingEye.SpacerServices
                 throw new HttpBadRequestException("设备资源号不能为空");
             }
 
-            // 2. 查询数据库记录
+            // 2. 查询最新的数据库记录
             var trimmedResourceId = data.ResourceId.Trim();
-            var model = await _spacerValidationDataRepository.FindAsync(item =>
-                trimmedResourceId == item.ResourceId.Trim());
+
+            var model = await this.GetLatestAsync(trimmedResourceId);
 
             if (model == null)
             {
