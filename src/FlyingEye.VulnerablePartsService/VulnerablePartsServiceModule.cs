@@ -40,6 +40,8 @@ namespace FlyingEye
             var hostingEnvironment = context.Services.GetHostingEnvironment();
             var configuration = context.Services.GetConfiguration();
 
+            context.Services.AddHealthChecks();
+
             context.Services.AddCors(options =>
             {
                 options.AddDefaultPolicy(builder =>
@@ -187,6 +189,7 @@ namespace FlyingEye
 
             app.UseEndpoints(options =>
             {
+                options.MapHealthChecks("/health");
                 options.MapControllers();
             });
 
