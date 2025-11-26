@@ -345,7 +345,7 @@ namespace FlyingEye.SpacerServices
             if (errors.Count > 0)
             {
                 throw new HttpUnprocessableEntityException(
-                    message: $"设备 {trimmedResourceId} 的垫片信息校验失败",
+                    message: $"设备 {trimmedResourceId} 的 {model.ABSite} 面垫片信息校验失败",
                     details: string.Join("; ", errors)
                 );
             }
