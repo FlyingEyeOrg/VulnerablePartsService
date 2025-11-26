@@ -52,24 +52,35 @@ namespace FlyingEye.SpacerServices
         /// <summary>
         /// 获取最新的垫片参数信息（优化版）
         /// </summary>
-        public async Task<SpacerValidationDataResult> GetLatestAsync(string resourceId)
+        public async Task<SpacerValidationDataResult> GetLatestAsync(string resourceId, string abSite)
         {
             if (string.IsNullOrWhiteSpace(resourceId))
             {
                 throw new HttpBadRequestException("设备资源号不能为空");
             }
 
+            if (string.IsNullOrWhiteSpace(abSite))
+            {
+                throw new HttpBadRequestException("A/B面不能为空");
+            }
+
             var trimmedResourceId = resourceId.Trim();
+            var trimmedAbSite = abSite.Trim();
             var queryable = await _spacerValidationDataRepository.GetQueryableAsync();
 
+            if (trimmedAbSite != "A" && trimmedAbSite != "B")
+            {
+                throw new HttpBadRequestException("A/B面只能是A或B");
+            }
+
             var latestEntity = await queryable
-                .Where(x => x.ResourceId == trimmedResourceId)
+                .Where(x => x.ResourceId == trimmedResourceId && x.ABSite == trimmedAbSite)
                 .OrderByDescending(x => x.CreationTime)
                 .FirstOrDefaultAsync();
 
             if (latestEntity == null)
             {
-                throw new HttpNotFoundException($"PE 未维护设备 {trimmedResourceId} 的垫片信息");
+                throw new HttpNotFoundException($"PE 未维护设备 {trimmedResourceId} 的 {trimmedAbSite} 面垫片信息");
             }
 
             return ObjectMapper.Map<SpacerValidationDataModel, SpacerValidationDataResult>(latestEntity);
@@ -118,7 +129,7 @@ namespace FlyingEye.SpacerServices
             try
             {
                 // 获取最新的数据进行比较
-                var latestData = await GetLatestAsync(newData.ResourceId);
+                var latestData = await GetLatestAsync(newData.ResourceId, newData.ABSite);
 
                 // 检查8个核心参数是否完全相同
                 if (AreCoreParametersIdentical(newData, latestData))
@@ -221,7 +232,7 @@ namespace FlyingEye.SpacerServices
             // 3. 格式验证
             if (!string.IsNullOrWhiteSpace(data.ABSite))
             {
-                var absite = data.ABSite.Trim().ToUpper();
+                var absite = data.ABSite.Trim();
                 if (absite != "A" && absite != "B")
                 {
                     errors.Add("A/B面只能是A或B");
@@ -301,12 +312,7 @@ namespace FlyingEye.SpacerServices
 
             // 2. 查询最新的数据库记录
             var trimmedResourceId = data.ResourceId.Trim();
-            var model = await GetLatestAsync(trimmedResourceId);
-
-            if (model == null)
-            {
-                throw new HttpNotFoundException($"PE 未维护设备 {trimmedResourceId} 的垫片信息");
-            }
+            var model = await GetLatestAsync(trimmedResourceId, data.ABSite);
 
             // 3. 校验参数是否匹配
             var errors = new List<string>();
