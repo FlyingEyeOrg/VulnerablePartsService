@@ -17,6 +17,17 @@ namespace FlyingEye.EntityFrameworkCore
             {
                 builder.ToTable(VulnerablePartsServiceDbConsts.DbTablePrefix + "SpacerValidationData",
                     VulnerablePartsServiceDbConsts.DbSchema);
+
+                // 一个设备，只能存在一个 A 面和 B 面垫片。
+                builder.HasIndex(e => new { e.ResourceId, e.ABSite })
+                .IsUnique()
+                .HasDatabaseName("IX_SpacerValidationData_ResourceId_ABSite"); ;
+            });
+
+            modelBuilder.Entity<SpacerValidationDataRecordModel>(builder =>
+            {
+                builder.ToTable(VulnerablePartsServiceDbConsts.DbTablePrefix + "SpacerValidationDataRecords", 
+                    VulnerablePartsServiceDbConsts.DbSchema);
             });
 
             base.OnModelCreating(modelBuilder);
