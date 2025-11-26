@@ -13,6 +13,12 @@ namespace FlyingEye
 
             CreateMap<SpacerValidationDataResult, SpacerValidationDataModel>()
                 .ReverseMap();
+
+            CreateMap<SpacerValidationData, SpacerValidationDataRecordModel>()
+               .ReverseMap();
+
+            CreateMap<SpacerValidationDataResult, SpacerValidationDataRecordModel>()
+                .ReverseMap();
         }
     }
 }
