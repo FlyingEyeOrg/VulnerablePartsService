@@ -35,6 +35,7 @@ namespace FlyingEye.Controllers
         /// 获取设备最新的垫片参数信息
         /// </summary>
         /// <param name="resourceId">设备资源号</param>
+        /// <param name="abSite">AB面</param>
         /// <returns>垫片验证数据</returns>
         [HttpGet]
         [Route("devices/{resourceId}/latest")]
@@ -42,9 +43,9 @@ namespace FlyingEye.Controllers
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
         public async Task<ActionResult<SpacerValidationDataResult>> GetLatestByResourceIdAsync(
-            [Required][FromRoute] string resourceId)
+            [Required][FromRoute] string resourceId, [FromQuery][Required] string abSite)
         {
-            var result = await _spacerValidationService.GetLatestAsync(resourceId);
+            var result = await _spacerValidationService.GetLatestAsync(resourceId, abSite);
             return Ok(result);
         }
 
