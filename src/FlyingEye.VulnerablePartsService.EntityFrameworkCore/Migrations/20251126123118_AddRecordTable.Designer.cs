@@ -4,6 +4,7 @@ using FlyingEye.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Volo.Abp.EntityFrameworkCore;
 
@@ -12,9 +13,11 @@ using Volo.Abp.EntityFrameworkCore;
 namespace FlyingEye.Migrations
 {
     [DbContext(typeof(VulnerablePartsServiceDbContext))]
-    partial class VulnerablePartsServiceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251126123118_AddRecordTable")]
+    partial class AddRecordTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
