@@ -24,7 +24,7 @@ namespace FlyingEye.Controllers
         /// </summary>
         /// <param name="id">垫片参数记录的唯一标识符</param>
         /// <returns>垫片参数详细信息</returns>
-        [HttpGet("{id:guid}")]
+        [HttpGet("{id:guid}", Name = nameof(GetByIdAsync))]
         [ProducesResponseType(typeof(SpacerValidationDataResult), 200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
@@ -67,7 +67,7 @@ namespace FlyingEye.Controllers
         {
             var result = await _spacerValidationService.InsertAsync(data);
 
-            return CreatedAtAction(
+            return CreatedAtRoute(
                 nameof(GetByIdAsync),
                 new { id = result.Id },
                 result);
