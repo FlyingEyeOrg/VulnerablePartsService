@@ -4,7 +4,8 @@ using FlyingEye.Spacers.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Volo.Abp.Application.Services;
-using Volo.Abp.ObjectMapping;
+using Volo.Abp.Domain.Repositories;
+using Volo.Abp.Uow;
 
 namespace FlyingEye.SpacerServices
 {
@@ -15,9 +16,14 @@ namespace FlyingEye.SpacerServices
     {
         private readonly ISpacerValidationDataRepository _spacerValidationDataRepository;
 
-        public SpacerValidationService(ISpacerValidationDataRepository spacerValidationDataRepository)
+        private readonly ISpacerValidationDataRecordRepository _spacerValidationDataRecordRepository;
+
+        public SpacerValidationService(
+            ISpacerValidationDataRepository spacerValidationDataRepository,
+            ISpacerValidationDataRecordRepository spacerValidationDataRecordRepository)
         {
             _spacerValidationDataRepository = spacerValidationDataRepository;
+            _spacerValidationDataRecordRepository = spacerValidationDataRecordRepository;
         }
 
         /// <summary>
@@ -41,7 +47,7 @@ namespace FlyingEye.SpacerServices
             if (model == null)
             {
                 throw new HttpNotFoundException(
-                    message: $"未找到ID为 {id} 的垫片参数记录",
+                    message: $"未找到ID为 {id} 的垫片参数",
                     details: $"请检查ID是否正确，或该记录可能已被删除"
                 );
             }
@@ -50,9 +56,39 @@ namespace FlyingEye.SpacerServices
         }
 
         /// <summary>
-        /// 获取最新的垫片参数信息（优化版）
+        /// 根据ID获取垫片参数记录 
         /// </summary>
-        public async Task<SpacerValidationDataResult> GetLatestAsync(string resourceId, string abSite)
+        /// <param name="id">记录 id</param>
+        /// <returns></returns>
+        /// <exception cref="HttpBadRequestException">参数验证异常</exception>
+        /// <exception cref="HttpNotFoundException">记录不存在异常</exception>
+        public async Task<SpacerValidationDataResult> GetRecordAsync(Guid id)
+        {
+            // 验证ID有效性
+            if (id == Guid.Empty)
+            {
+                throw new HttpBadRequestException("ID不能为空", "INVALID_ID");
+            }
+
+            // 查询数据库
+            var model = await _spacerValidationDataRecordRepository.FindAsync(id);
+
+            // 检查记录是否存在
+            if (model == null)
+            {
+                throw new HttpNotFoundException(
+                    message: $"未找到ID为 {id} 的垫片参数记录",
+                    details: $"请检查ID是否正确，或该记录可能已被删除"
+                );
+            }
+
+            return ObjectMapper.Map<SpacerValidationDataRecordModel, SpacerValidationDataResult>(model);
+        }
+
+        /// <summary>
+        /// 获取获取指定设备的垫片信息
+        /// </summary>
+        public async Task<SpacerValidationDataResult> GetAsync(string resourceId, string abSite)
         {
             if (string.IsNullOrWhiteSpace(resourceId))
             {
@@ -73,23 +109,66 @@ namespace FlyingEye.SpacerServices
                 throw new HttpBadRequestException("A/B面只能是A或B");
             }
 
-            var latestEntity = await queryable
+            var entity = await queryable
                 .Where(x => x.ResourceId == trimmedResourceId && x.ABSite == trimmedAbSite)
-                .OrderByDescending(x => x.CreationTime)
                 .FirstOrDefaultAsync();
 
-            if (latestEntity == null)
+            if (entity == null)
             {
                 throw new HttpNotFoundException($"PE 未维护设备 {trimmedResourceId} 的 {trimmedAbSite} 面垫片信息");
             }
 
-            return ObjectMapper.Map<SpacerValidationDataModel, SpacerValidationDataResult>(latestEntity);
+            return ObjectMapper.Map<SpacerValidationDataModel, SpacerValidationDataResult>(entity);
         }
 
         /// <summary>
-        /// 添加新的垫片参数信息
+        /// 插入一个垫片参数信息
         /// </summary>
-        public async Task<SpacerValidationDataResult> AddAsync(SpacerValidationData data)
+        /// <param name="data">垫片参数</param>
+        /// <returns>返回插入的数据</returns>
+        public async Task<SpacerValidationDataResult> InsertAsync(SpacerValidationData data)
+        {
+            // 1. 校验所有必填字段
+            VerifyAllFields(data);
+
+            // 2. 执行Trim处理
+            var trimmedData = TrimAllFields(data);
+
+            // 3. 检查是否已经存在相同设备+A/B面的记录
+            var existingEntity = await _spacerValidationDataRepository.FindAsync(
+                item => item.ResourceId == trimmedData.ResourceId
+                && item.ABSite == trimmedData.ABSite);
+
+            if (existingEntity != null)
+            {
+                throw new HttpConflictException(
+                    message: $"设备 {trimmedData.ResourceId} 的 {trimmedData.ABSite} 面垫片信息已存在",
+                    details: $"请使用更新接口或删除现有记录后重试。现有记录ID: {existingEntity.Id}"
+                );
+            }
+
+            // 4. 在事务中插入数据到两个表
+            using var uow = this.UnitOfWorkManager.Begin();
+
+            // 插入到主表
+            var mainEntity = ObjectMapper.Map<SpacerValidationData, SpacerValidationDataModel>(trimmedData);
+            mainEntity = await _spacerValidationDataRepository.InsertAsync(mainEntity);
+
+            // 插入到记录表
+            var recordEntity = ObjectMapper.Map<SpacerValidationData, SpacerValidationDataRecordModel>(trimmedData);
+            await _spacerValidationDataRecordRepository.InsertAsync(recordEntity);
+
+            await uow.CompleteAsync();   // 提交事务
+
+            Logger.LogInformation($"成功插入设备 {trimmedData.ResourceId} 的 {trimmedData.ABSite} 面垫片参数，主表ID: {mainEntity.Id}");
+
+            return ObjectMapper.Map<SpacerValidationDataModel, SpacerValidationDataResult>(mainEntity);
+        }
+
+        /// <summary>
+        /// 更新垫片参数信息
+        /// </summary>
+        public async Task<SpacerValidationDataResult> UpdateAsync(SpacerValidationData data)
         {
             // 1. 校验所有必填字段
             VerifyAllFields(data);
@@ -99,26 +178,27 @@ namespace FlyingEye.SpacerServices
 
             // 3. 检查是否与最新数据完全重复（8个核心参数）
             await CheckForCompleteDuplicateAsync(trimmedData);
+            // ↑ 如果记录不存在，这里会抛出 HttpNotFoundException
 
-            // 4. 创建新的实体
-            var entity = new SpacerValidationDataModel(
-                site: trimmedData.Site,
-                resourceId: trimmedData.ResourceId,
-                @operator: trimmedData.Operator,
-                modelPn: trimmedData.ModelPn,
-                date: trimmedData.Date,
-                bigCoatingWidth: trimmedData.BigCoatingWidth,
-                smallCoatingWidth: trimmedData.SmallCoatingWidth,
-                whiteSpaceWidth: trimmedData.WhiteSpaceWidth,
-                aT11Width: trimmedData.AT11Width,
-                thickness: trimmedData.Thickness,
-                aBSite: trimmedData.ABSite
-            );
+            // 4. 查询现有记录
+            var currentModel = await _spacerValidationDataRepository.FirstAsync(
+                item => item.ResourceId == trimmedData.ResourceId
+                && item.ABSite == trimmedData.ABSite);
 
-            // 5. 保存到数据库
-            var model = await _spacerValidationDataRepository.InsertAsync(entity);
+            // 5. 在事务中更新数据
+            using var uow = this.UnitOfWorkManager.Begin();
 
-            return this.ObjectMapper.Map<SpacerValidationDataModel, SpacerValidationDataResult>(model);
+            // 更新主表记录
+            ObjectMapper.Map(trimmedData, currentModel);
+            currentModel = await _spacerValidationDataRepository.UpdateAsync(currentModel);
+
+            // 创建历史记录
+            var recordEntity = ObjectMapper.Map<SpacerValidationData, SpacerValidationDataRecordModel>(trimmedData);
+            await _spacerValidationDataRecordRepository.InsertAsync(recordEntity);
+
+            await uow.CompleteAsync();   // 提交事务
+
+            return ObjectMapper.Map<SpacerValidationDataModel, SpacerValidationDataResult>(currentModel);
         }
 
         /// <summary>
@@ -126,27 +206,16 @@ namespace FlyingEye.SpacerServices
         /// </summary>
         private async Task CheckForCompleteDuplicateAsync(SpacerValidationData newData)
         {
-            try
-            {
-                // 获取最新的数据进行比较
-                var latestData = await GetLatestAsync(newData.ResourceId, newData.ABSite);
+            // 获取最新的数据进行比较
+            var latestData = await GetAsync(newData.ResourceId, newData.ABSite);
 
-                // 检查8个核心参数是否完全相同
-                if (AreCoreParametersIdentical(newData, latestData))
-                {
-                    throw new HttpConflictException(
-                        message: "数据重复，8个核心参数与最新记录完全相同",
-                        details: GenerateCoreParametersComparison(newData, latestData)
-                    );
-                }
-
-                // 如果有任何一个参数不同，就允许添加
-                Logger.LogInformation($"设备 {newData.ResourceId} 的新记录与最新记录存在差异，允许添加");
-            }
-            catch (HttpNotFoundException)
+            // 检查8个核心参数是否完全相同
+            if (AreCoreParametersIdentical(newData, latestData))
             {
-                // 如果没有历史记录，说明是第一次添加，允许通过
-                Logger.LogInformation($"设备 {newData.ResourceId} 首次添加垫片参数");
+                throw new HttpConflictException(
+                    message: "数据重复，8个核心参数与最新记录完全相同",
+                    details: GenerateCoreParametersComparison(newData, latestData)
+                );
             }
         }
 
@@ -312,7 +381,7 @@ namespace FlyingEye.SpacerServices
 
             // 2. 查询最新的数据库记录
             var trimmedResourceId = data.ResourceId.Trim();
-            var model = await GetLatestAsync(trimmedResourceId, data.ABSite);
+            var model = await GetAsync(trimmedResourceId, data.ABSite);
 
             // 3. 校验参数是否匹配
             var errors = new List<string>();
@@ -359,7 +428,7 @@ namespace FlyingEye.SpacerServices
             request.Validate();
 
             var trimmedResourceId = request.ResourceId.Trim();
-            var queryable = await _spacerValidationDataRepository.GetQueryableAsync();
+            var queryable = await _spacerValidationDataRecordRepository.GetQueryableAsync();
 
             // 基础查询条件
             var baseQuery = queryable
@@ -386,7 +455,7 @@ namespace FlyingEye.SpacerServices
                 .Take(request.MaxResultCount)
                 .ToListAsync();
 
-            var data = ObjectMapper.Map<List<SpacerValidationDataModel>, List<SpacerValidationDataResult>>(records);
+            var data = ObjectMapper.Map<List<SpacerValidationDataRecordModel>, List<SpacerValidationDataResult>>(records);
 
             return new SpacerRecordsQueryResult(data, totalCount, request.SkipCount, request.MaxResultCount);
         }
@@ -394,8 +463,8 @@ namespace FlyingEye.SpacerServices
         /// <summary>
         /// 应用排序规则
         /// </summary>
-        private IQueryable<SpacerValidationDataModel> ApplySorting(
-            IQueryable<SpacerValidationDataModel> query, string sorting)
+        private IQueryable<SpacerValidationDataRecordModel> ApplySorting(
+            IQueryable<SpacerValidationDataRecordModel> query, string sorting)
         {
             if (string.IsNullOrWhiteSpace(sorting))
             {
@@ -406,7 +475,7 @@ namespace FlyingEye.SpacerServices
             // 解析排序字符串（支持多字段排序，如 "CreationTime DESC, Date ASC"）
             var sortFields = sorting.Split(',', StringSplitOptions.RemoveEmptyEntries);
 
-            IOrderedQueryable<SpacerValidationDataModel>? orderedQuery = null;
+            IOrderedQueryable<SpacerValidationDataRecordModel>? orderedQuery = null;
 
             foreach (var sortField in sortFields)
             {
@@ -423,8 +492,8 @@ namespace FlyingEye.SpacerServices
         /// <summary>
         /// 应用单个字段排序
         /// </summary>
-        private IOrderedQueryable<SpacerValidationDataModel> ApplySingleSort(
-            IQueryable<SpacerValidationDataModel> query, string fieldName, string sortDirection)
+        private IOrderedQueryable<SpacerValidationDataRecordModel> ApplySingleSort(
+            IQueryable<SpacerValidationDataRecordModel> query, string fieldName, string sortDirection)
         {
             var isAscending = sortDirection == "ASC";
 
